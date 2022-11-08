@@ -1,0 +1,11 @@
+.search{
+    margin: 50px;
+}
+.aspirante{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+h1{
+    margin: 50px;
+}

@@ -1,0 +1,12 @@
+h1{
+    padding: 50px;
+}
+.aspirante{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.regresar{
+    padding-left: 50px;
+    margin: 25px;
+}

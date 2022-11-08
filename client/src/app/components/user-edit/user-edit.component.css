@@ -1,0 +1,15 @@
+.container-fluid{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+img{
+    max-width: 250px;
+}
+.formulario{
+    padding: 50px;
+}
+app-footer{
+    border-top: 1px solid #444;
+}

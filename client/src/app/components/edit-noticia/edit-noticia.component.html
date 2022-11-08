@@ -1,0 +1,19 @@
+<app-menus></app-menus>
+<div class="container">
+	<h2>Noticias</h2>
+<a [routerLink]="['/register-noticia']" class="new">
+	Agregar noticia
+</a>
+	<div class="row">
+		<div *ngFor="let noticia of noticias" class="noticia col-lg-4 m-3">
+			<a [routerLink]="['/cargar-imagen-noticia', noticia._id]">
+				<div *ngIf="noticia.image">
+					<img src="{{ url+'get-image-noticia/'+ noticia.image }}" />
+				</div>
+				<h3>{{noticia.tNoticia}}</h3>
+				<p>{{noticia.resumen}}</p>
+			</a>
+		</div>
+	</div>
+</div>
+<app-footer></app-footer>
