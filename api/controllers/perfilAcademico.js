@@ -154,7 +154,8 @@ function uploadPerfilAcademicoImage(req, res){
 		var file_name = file_split[2];
 		console.log(file_name);
 
-		var ext_split = file_name.split('\.');
+    var file_split = file_path('/');
+		//var ext_split = file_name.split('\.');
 		console.log(ext_split);
 
 		var file_ext = ext_split[1];

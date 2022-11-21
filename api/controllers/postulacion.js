@@ -2,43 +2,38 @@
 var fs = require("fs");
 var path = require("path");
 
-var OfertaLaboral = require("../models/ofertaLaboral");
+var Postulacion = require("../models/postulacion");
 var User = require("../models/user");
 var jwt = require("../services/jwt");
 // Registro
 
-function saveOfertaLaboral(req, res) {
+function savePostulacion(req, res) {
   var params = req.body;
-  var ofertaLaboral = new OfertaLaboral();
+  var postulacion = new Postulacion();
 
-  if (params.titulo) {
-    ofertaLaboral.user = req.user.sub;
-    ofertaLaboral.titulo = params.titulo;
-    ofertaLaboral.cargo = params.cargo;
-    ofertaLaboral.description = params.description;
-    ofertaLaboral.fechaIngreso = params.fechaIngreso;
-    ofertaLaboral.fechaSolicitud = params.fechaSolicitud;
-    ofertaLaboral.aprobacion = params.aprobacion;
-    ofertaLaboral.activo = params.activo;
-    ofertaLaboral.image = null;
+  if (params.politica) {
+    postulacion.user = req.user.sub;
+    postulacion.ofertaLaborall = params.ofertaLaborall;
+    postulacion.fechaPostulacion = params.fechaPostulacion;
+    postulacion.politica = params.politica;
 
-    //ofertaLaborals duplicados controll
-    OfertaLaboral.find({
+    //postulacions duplicados controll
+    Postulacion.find({
 
-    }).exec((err, ofertaLaborals) => {
+    }).exec((err, postulacions) => {
       if (err)
         return res
           .status(500)
-          .send({ message: "Error en la petición de ofertaLaboral" });
+          .send({ message: "Error en la petición de postulacion" });
 
-        ofertaLaboral.save((err, ofertaLaboralStored) => {
+        postulacion.save((err, postulacionStored) => {
           if (err)
             return res
               .status(500)
               .send({ message: "No se ha podido guardar el usuario" });
 
-          if (ofertaLaboralStored) {
-            res.status(200).send({ ofertaLaboral: ofertaLaboralStored });
+          if (postulacionStored) {
+            res.status(200).send({ postulacion: postulacionStored });
           } else {
             res.status(404).send({ message: "No se ha registrado el usuario" });
           }
@@ -52,83 +47,83 @@ function saveOfertaLaboral(req, res) {
   }
 }
 
-// Conseguir datos de un OfertaLaboral
-function getOfertaLaboral(req, res) {
-  var ofertaLaboralId = req.params.id;
+// Conseguir datos de un postulacion
+function getPostulacion(req, res) {
+  var postulacionId = req.params.id;
 
-  if (ofertaLaboralId == null) {
-    if (!ofertaLaboral)
+  if (postulacionId == null) {
+    if (!postulacion)
       return res.status(404).send({ message: "No existe el proyecto" });
   }
 
-  OfertaLaboral.findById(ofertaLaboralId, (err, ofertaLaboral) => {
+  Postulacion.findById(postulacionId, (err, postulacion) => {
     if (err)
       return res.status(500).send({ message: "Error al devolver los datos" });
-    if (!ofertaLaboral)
+    if (!postulacion)
       return res.status(404).send({ message: "No existe el usuario" });
 
     return res.status(200).send({
-      ofertaLaboral,
+      postulacion,
     });
   });
 }
 
-function getOfertaLaborals(req, res) {
-  OfertaLaboral.find()
+function getPostulacions(req, res) {
+  Postulacion.find()
     .sort("fechaIngreso")
-    .exec((err, ofertaLaborals) => {
+    .exec((err, postulacions) => {
       if (err)
         return res.status(500).send({ message: "Error al devolver los datos" });
-      if (!ofertaLaborals)
+      if (!postulacions)
         return res
           .status(404)
           .send({ message: "No exisen usuarios para mostrar" });
 
       return res.status(200).send({
-        ofertaLaborals,
+        postulacions,
       });
     });
 }
 
-function updateOfertaLaboral(req, res) {
-  var ofertaLaboralId = req.params.id;
+function updatePostulacion(req, res) {
+  var postulacionId = req.params.id;
   var update = req.body;
 
-  OfertaLaboral.findByIdAndUpdate(
-    ofertaLaboralId,
+  Postulacion.findByIdAndUpdate(
+    postulacionId,
     update,
     { new: true },
-    (err, ofertaLaboralUpdated) => {
+    (err, postulacionUpdated) => {
       if (err)
         return res
           .status(500)
           .send({ message: "Error al actualizar los datos" });
-      if (!ofertaLaboralUpdated)
+      if (!postulacionUpdated)
         return res.status(404).send({ message: "No existe el usuario" });
 
       return res.status(200).send({
-        ofertaLaboral: ofertaLaboralUpdated,
+        postulacion: postulacionUpdated,
       });
     }
   );
 }
-function deleteOfertaLaboral(req, res) {
-  var ofertaLaboralId = req.params.id;
+function deletePostulacion(req, res) {
+  var postulacionId = req.params.id;
 
-  OfertaLaboral.findByIdAndRemove(
-    ofertaLaboralId,
-    (err, ofertaLaboralRemoved) => {
+  Postulacion.findByIdAndRemove(
+    postulacionId,
+    (err, postulacionRemoved) => {
       if (err)
         return res
           .status(500)
           .send({ message: "Error al eliminar el usuario" });
-      if (!ofertaLaboralRemoved)
+      if (!postulacionRemoved)
         return res
           .status(404)
           .send({ message: "No se puede eliminar el usuario" });
 
       return res.status(200).send({
-        ofertaLaboral: ofertaLaboralRemoved,
+        postulacion: postulacionRemoved,
       });
     }
   );
@@ -137,14 +132,14 @@ function deleteOfertaLaboral(req, res) {
 
 
 // Subir archivos de imagen/avatar de usuario
-function uploadOfertaLaboralImage(req, res){
-	var ofertaLaboralId = req.params.id;
+function uploadPostulacionImage(req, res){
+	var postulacionId = req.params.id;
 
 	if(req.files){
 		var file_path = req.files.image.path;
 		console.log(file_path);
 		
-    var file_split = file_path.split('\\');
+		var file_split = file_path.split('\\');
 		console.log(file_split);
 
 		var file_name = file_split[2];
@@ -156,16 +151,15 @@ function uploadOfertaLaboralImage(req, res){
 		var file_ext = ext_split[1];
 		console.log(file_ext);
 
-
 		if(file_ext == 'png' || file_ext == 'jpg' || file_ext == 'jpeg' || file_ext == 'gif'){
 			 
-			 // Actualizar documento de ofertaLaboral logueado
-			 OfertaLaboral.findByIdAndUpdate(ofertaLaboralId, {image: file_name}, {new:true}, (err, ofertaLaboralUpdated) =>{
+			 // Actualizar documento de Postulacion logueado
+			 Postulacion.findByIdAndUpdate(postulacionId, {image: file_name}, {new:true}, (err, postulacionUpdated) =>{
 				if(err) return res.status(500).send({message: 'Error en la petición'});
 
-				if(!ofertaLaboralUpdated) return res.status(404).send({message: 'No se ha podido actualizar la oferta'});
+				if(!postulacionUpdated) return res.status(404).send({message: 'No se ha podido actualizar la oferta'});
 
-				return res.status(200).send({ofertaLaboral: ofertaLaboralUpdated});
+				return res.status(200).send({postulacion: postulacionUpdated});
 			 });
 
 		}else{
@@ -183,9 +177,9 @@ function removeFilesOfUploads(res, file_path, message){
 	});
 }
 
-function getOfertaLaboralImageFile(req, res){
+function getPostulacionImageFile(req, res){
 	var image_file = req.params.imageFile;
-	var path_file = './uploads/ofertaLaborals/'+image_file;
+	var path_file = './uploads/postulacions/'+image_file;
 
 	fs.exists(path_file, (exists) => {
 		if(exists){
@@ -196,19 +190,19 @@ function getOfertaLaboralImageFile(req, res){
 	});
 }
 
-function searchOfertaLaboral(req,res){
+function searchPostulacion(req,res){
   //sacar el string a buscar
   
   var searchString = req.params.search;
   
   //find or
   
-  OfertaLaboral.find({"$or":[
+  Postulacion.find({"$or":[
     {"cargo":{"$regex": searchString, "$options":"i"}},
     {"titulo":{"$regex": searchString, "$options":"i"}}
   ]})
   .sort([['cargo', 'descending']])
-  .exec((err,ofertaLaborals)=>{
+  .exec((err,postulacions)=>{
   
     if(err){
       return res.status(500).send({
@@ -216,7 +210,7 @@ function searchOfertaLaboral(req,res){
         message: 'Error en la petición'
       });
     }
-    if(!ofertaLaborals || ofertaLaborals.length <= 0){
+    if(!postulacions || postulacions.length <= 0){
       return res.status(404).send({
         status: 'error',
         message: 'No hay oferta Laborals para que coincidan con tu busquedad'
@@ -225,7 +219,7 @@ function searchOfertaLaboral(req,res){
   
     return res.status(200).send({
       status: 'succes',
-      ofertaLaborals
+      postulacions
     });
   
   });
@@ -234,12 +228,12 @@ function searchOfertaLaboral(req,res){
 
 
 module.exports = {
-  saveOfertaLaboral,
-  getOfertaLaboral,
-  getOfertaLaborals,
-  updateOfertaLaboral,
-  deleteOfertaLaboral,
-  uploadOfertaLaboralImage,
-  getOfertaLaboralImageFile,
-  searchOfertaLaboral
+  savePostulacion,
+  getPostulacion,
+  getPostulacions,
+  updatePostulacion,
+  deletePostulacion,
+  uploadPostulacionImage,
+  getPostulacionImageFile,
+  searchPostulacion
 };

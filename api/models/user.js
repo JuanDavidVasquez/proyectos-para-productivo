@@ -16,7 +16,8 @@ var UserSchema = Schema ({
     nick:       String,
     email:      String,
     password:   String,
-    rol:        String,
+    role:       String,
+    politica:   String,
     image:      String
 });
 

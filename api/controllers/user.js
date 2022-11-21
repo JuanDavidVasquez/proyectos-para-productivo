@@ -27,9 +27,6 @@ function saveUser(req, res) {
   var user = new User();
 
   if (
-    params.name &&
-    params.surname &&
-    params.nick &&
     params.email &&
     params.password
   ) {
@@ -45,6 +42,7 @@ function saveUser(req, res) {
     user.nick = params.nick;
     user.email = params.email;
     user.role = params.role;
+	user.politica = params.politica;
     user.image = null;
 
     //Usuarios duplicados controll
@@ -380,6 +378,37 @@ function updateUser(req, res){
 		 });
 }
 
+function updateColaborador(req, res){
+	var userId = req.params.id;
+	var update = req.body;
+
+	// borrar propiedad password
+	delete update.password;
+
+
+	User.find({ $or: [
+				 {email: update.email.toLowerCase()},
+				 {nick: update.nick.toLowerCase()}
+		 ]}).exec((err, users) => {
+		 
+		 	var user_isset = false;
+		 	users.forEach((user) => {
+		 		if(user && user._id != userId) user_isset = true;
+		 	});
+
+		 	if(user_isset) return res.status(404).send({message: 'Los datos ya están en uso'});
+		 	
+		 	User.findByIdAndUpdate(userId, update, {new:true}, (err, userUpdated) => {
+				if(err) return res.status(500).send({message: 'Error en la petición'});
+
+				if(!userUpdated) return res.status(404).send({message: 'No se ha podido actualizar el usuario'});
+
+				return res.status(200).send({user: userUpdated});
+			});
+
+		 });
+}
+
 
 // Subir archivos de imagen/avatar de usuario
 function uploadImage(req, res){
@@ -389,8 +418,8 @@ function uploadImage(req, res){
 		var file_path = req.files.image.path;
 		console.log(file_path);
 		
-	var file_split = file_path.split('\\');
-		//var file_split = file_path.split('/'); //linux o mac
+//		var file_split = file_path.split('\\');
+		var file_split = file_path('/');
 		console.log(file_split);
 
 		var file_name = file_split[2];
@@ -445,6 +474,44 @@ function getImageFile(req, res){
 	});
 }
 
+
+function searchUser(req,res){
+	//sacar el string a buscar
+	
+	var searchString = req.params.search;
+	
+	//find or
+	
+	User.find({"$or":[
+	  {"name":{"$regex": searchString, "$options":"i"}},
+	  {"surname":{"$regex": searchString, "$options":"i"}},
+	  {"surname2":{"$regex": searchString, "$options":"i"}}
+	]})
+	.sort([['surname', 'descending']])
+	.exec((err,users)=>{
+	
+	  if(err){
+		return res.status(500).send({
+		  status: 'error',
+		  message: 'Error en la petición'
+		});
+	  }
+	  if(!users || users.length <= 0){
+		return res.status(404).send({
+		  status: 'error',
+		  message: 'No hay oferta Laborals para que coincidan con tu busquedad'
+		});
+	  }
+	
+	  return res.status(200).send({
+		status: 'succes',
+		users
+	  });
+	
+	});
+  
+  }
+
 module.exports = {
 	home,
 	saveUser,
@@ -454,5 +521,7 @@ module.exports = {
 	updateUser,
 	uploadImage,
 	getImageFile,
-    getCounters
+    getCounters,
+	updateColaborador,
+	searchUser
 }
